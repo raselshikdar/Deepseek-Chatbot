@@ -1,13 +1,13 @@
 {
-  "name": "deepseek-chatbot",
+  "name": "chatbot-project",
   "version": "1.0.0",
-  "description": "A chatbot using Deepseek API",
+  "description": "A chatbot using Deepseek and Novita.ai APIs",
   "main": "api/chat.js",
   "scripts": {
-    "start": "vercel dev"
+    "start": "vercel dev",
+    "deploy": "vercel --prod"
   },
   "dependencies": {
-    "openai": "^4.0.0",
-    "dotenv": "^16.0.3"
+    "openai": "^4.0.0"
   }
 }
