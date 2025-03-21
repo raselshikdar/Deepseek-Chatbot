@@ -58,6 +58,9 @@
             justify-content: space-between;
             border-bottom: 1px solid var(--border);
             background: var(--background);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .logo {
@@ -124,6 +127,8 @@
             padding: 1.5rem;
             border-top: 1px solid var(--border);
             background: var(--background);
+            position: sticky;
+            bottom: 0;
         }
 
         .input-wrapper {
@@ -156,14 +161,89 @@
             color: var(--text-secondary);
         }
 
+        .welcome-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .examples-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            max-width: 600px;
+            width: 100%;
+            margin-top: 2rem;
+        }
+
+        .example-card {
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--background);
+            text-align: left;
+        }
+
+        .example-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--text-primary);
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         @media (max-width: 768px) {
+            .chat-box {
+                padding: 1rem;
+            }
+
             .message {
                 max-width: 95%;
+                gap: 0.75rem;
+            }
+
+            .examples-container {
+                grid-template-columns: 1fr;
+            }
+
+            .example-card {
+                padding: 1rem;
+            }
+
+            .welcome-container {
+                padding: 1rem;
+            }
+
+            textarea {
+                padding: 1rem 3.5rem 1rem 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .chat-header {
+                padding: 0.75rem;
+            }
+
+            .logo span {
+                display: none;
+            }
+
+            .avatar {
+                width: 28px;
+                height: 28px;
+                font-size: 0.9rem;
+            }
+
+            .message-content {
+                padding: 0.75rem 1rem;
             }
         }
     </style>
@@ -183,7 +263,25 @@
             <button onclick="toggleTheme()">🌓</button>
         </div>
 
-        <div class="chat-box" id="chatBox"></div>
+        <div class="chat-box" id="chatBox">
+            <div class="welcome-container" id="welcomeMessage">
+                <h2>How can I help you today?</h2>
+                <div class="examples-container">
+                    <div class="example-card" onclick="handleExample('Explain quantum computing in simple terms')">
+                        Explain quantum computing
+                    </div>
+                    <div class="example-card" onclick="handleExample('How do I make a HTTP request in JavaScript?')">
+                        JavaScript HTTP request
+                    </div>
+                    <div class="example-card" onclick="handleExample('Write a poem about artificial intelligence')">
+                        AI poetry
+                    </div>
+                    <div class="example-card" onclick="handleExample('Give me 3 ideas for a science fiction story')">
+                        Sci-fi story ideas
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="input-container">
             <div class="input-wrapper">
@@ -214,6 +312,12 @@
 
         function renderMessages() {
             const chatBox = document.getElementById('chatBox');
+            const welcomeMessage = document.getElementById('welcomeMessage');
+            
+            // Toggle welcome message visibility
+            welcomeMessage.style.display = messages.length === 0 ? 'flex' : 'none';
+            
+            // Render chat messages
             chatBox.innerHTML = messages.map(msg => `
                 <div class="message ${msg.role === 'user' ? 'user-message' : ''}">
                     <div class="avatar ${msg.role === 'user' ? '' : 'bot-avatar'}">
@@ -225,6 +329,7 @@
                 </div>
             `).join('');
             
+            // Apply syntax highlighting
             document.querySelectorAll('pre code').forEach(hljs.highlightElement);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
@@ -270,6 +375,13 @@
             }
         }
 
+        function handleExample(question) {
+            const input = document.getElementById('userInput');
+            input.value = question;
+            autoResize();
+            sendMessage();
+        }
+
         function autoResize() {
             const textarea = document.getElementById('userInput');
             textarea.style.height = 'auto';
@@ -281,6 +393,13 @@
                 e.preventDefault();
                 sendMessage();
             }
+        }
+
+        function clearHistory() {
+            messages = [];
+            localStorage.removeItem('chatHistory');
+            renderMessages();
+            document.getElementById('userInput').focus();
         }
 
         function toggleTheme() {
