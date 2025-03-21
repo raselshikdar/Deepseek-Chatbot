@@ -199,12 +199,12 @@
             color: var(--text-primary);
             resize: none;
             min-height: 44px;
-            max-height: 200px;
+            max-height: 150px;
             line-height: 1.5;
         }
 
         button {
-            padding: 0 20px;
+            padding: 0;
             background: var(--primary);
             color: white;
             border: none;
@@ -213,10 +213,21 @@
             font-weight: 500;
             transition: background 0.2s ease;
             flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         button:hover {
             background: var(--primary-hover);
+        }
+
+        .send-icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
         }
 
         .typing-indicator {
@@ -245,6 +256,13 @@
             justify-content: center;
             padding: 20px;
             text-align: center;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .welcome-container.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
 
         .examples-container {
@@ -364,7 +382,11 @@
             <div class="input-wrapper">
                 <textarea id="user-input" placeholder="Ask me something..." 
                        onkeydown="handleInput(event)" rows="1"></textarea>
-                <button onclick="sendMessage()">Send</button>
+                <button onclick="sendMessage()" aria-label="Send message">
+                    <svg class="send-icon" viewBox="0 0 24 24">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                </button>
             </div>
         </div>
         <div class="scroll-bottom-btn" id="scroll-bottom-btn" onclick="scrollToBottom()">↓</div>
@@ -375,7 +397,6 @@
         let messages = JSON.parse(localStorage.getItem('chatMessages')) || [];
         let abortController = new AbortController();
 
-        // Initialize Marked and Highlight.js
         marked.setOptions({
             breaks: true,
             highlight: (code, lang) => {
@@ -384,7 +405,6 @@
             }
         });
 
-        // Initial setup
         window.addEventListener('DOMContentLoaded', () => {
             loadTheme();
             renderMessages();
@@ -397,17 +417,21 @@
             const userInput = document.getElementById("user-input");
             const message = userInput.value.trim();
 
-            if (!message) return;
+            if (!message) {
+                userInput.focus();
+                return;
+            }
 
             isProcessing = true;
-            addMessage(message, 'user');
-            userInput.value = "";
-            adjustTextareaHeight();
+            userInput.disabled = true;
             
             try {
-                abortController = new AbortController();
+                addMessage(message, 'user');
+                userInput.value = "";
+                adjustTextareaHeight();
                 showTypingIndicator();
                 
+                abortController = new AbortController();
                 const response = await fetch("/api/chat", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -425,32 +449,19 @@
                 }
             } finally {
                 isProcessing = false;
+                userInput.disabled = false;
+                userInput.focus();
                 removeTypingIndicator();
                 scrollToBottom();
             }
         }
 
-        function addMessage(content, role) {
-            const message = {
-                content,
-                role,
-                timestamp: new Date().toISOString(),
-                id: Date.now()
-            };
-            
-            messages.push(message);
-            saveMessages();
-            renderMessages();
-        }
-
-                function renderMessages() {
+        function renderMessages() {
             const chatBox = document.getElementById("chat-box");
             const welcomeContainer = document.getElementById("welcome-container");
             
-            // Toggle welcome message visibility
-            welcomeContainer.style.display = messages.length > 0 ? 'none' : 'flex';
+            welcomeContainer.classList.toggle('hidden', messages.length > 0);
             
-            // Render messages
             chatBox.innerHTML = messages.map(msg => `
                 <div class="message ${msg.role === 'user' ? 'user-message' : 'bot-message'}">
                     <div class="message-avatar">
@@ -472,7 +483,6 @@
                 </div>
             `).join('');
             
-            // Apply syntax highlighting
             document.querySelectorAll('pre code').forEach(hljs.highlightElement);
             scrollToBottom();
         }
@@ -503,7 +513,7 @@
         function adjustTextareaHeight() {
             const textarea = document.getElementById("user-input");
             textarea.style.height = 'auto';
-            textarea.style.height = textarea.scrollHeight + 'px';
+            textarea.style.height = `${Math.min(textarea.scrollHeight, 150)}px`;
         }
 
         function handleInput(event) {
@@ -569,52 +579,3 @@
             const date = new Date(isoString);
             return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
-
-        function scrollToBottom() {
-            const chatBox = document.getElementById("chat-box");
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        function handleScroll() {
-            const chatBox = document.getElementById("chat-box");
-            const btn = document.getElementById("scroll-bottom-btn");
-            btn.style.display = chatBox.scrollTop + chatBox.clientHeight < chatBox.scrollHeight - 100 ? 
-                'flex' : 'none';
-        }
-
-        function showErrorMessage(text) {
-            const chatBox = document.getElementById("chat-box");
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error-message';
-            errorDiv.innerHTML = `
-                <span>${text}</span>
-                <button onclick="retryLastMessage()">Retry</button>
-            `;
-            chatBox.appendChild(errorDiv);
-            scrollToBottom();
-        }
-
-        function retryLastMessage() {
-            const lastMessage = messages[messages.length - 1];
-            if (lastMessage?.role === 'user') {
-                messages.pop();
-                sendMessage(lastMessage.content);
-            }
-        }
-
-        function abortRequest() {
-            if (isProcessing) {
-                abortController.abort();
-                isProcessing = false;
-                removeTypingIndicator();
-                showErrorMessage('Request canceled');
-            }
-        }
-
-        // Initialize event listeners
-        window.addEventListener('resize', adjustTextareaHeight);
-        document.getElementById("user-input").addEventListener('input', adjustTextareaHeight);
-        hljs.configure({ ignoreUnescapedHTML: true });
-    </script>
-</body>
-</html>
