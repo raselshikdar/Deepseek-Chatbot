@@ -67,7 +67,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            min-height: 0; /* Fix for Firefox scrolling */
+            min-height: 0;
         }
 
         .message {
@@ -148,6 +148,55 @@
             animation: typing 1.4s infinite ease-in-out;
         }
 
+        .welcome-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .examples-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            max-width: 800px;
+            width: 100%;
+            margin-top: 24px;
+        }
+
+        .example-question {
+            padding: 16px;
+            background: #f4f4f5;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #e4e4e7;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .example-question:hover {
+            background: #e5e5e5;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .welcome-text {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #18181b;
+        }
+
+        .welcome-subtext {
+            color: #71717a;
+            margin-bottom: 32px;
+            max-width: 600px;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -158,35 +207,18 @@
             30% { transform: translateY(-4px); }
         }
 
-        @media (min-width: 768px) {
-            .chat-container {
-                height: 90vh;
-                border-radius: 16px;
-                margin: 20px;
+        @media (max-width: 768px) {
+            .examples-container {
+                grid-template-columns: 1fr;
             }
             
-            .chat-header {
-                padding: 16px 24px;
+            .welcome-text {
+                font-size: 20px;
             }
             
-            .logo {
-                width: 36px;
-                height: 36px;
-                font-size: 16px;
-            }
-            
-            .chat-box {
-                padding: 24px;
-                gap: 16px;
-            }
-            
-            .message {
-                padding: 16px 20px;
-                font-size: 15px;
-            }
-            
-            .input-container {
-                padding: 16px 24px;
+            .example-question {
+                font-size: 13px;
+                padding: 14px;
             }
         }
     </style>
@@ -199,7 +231,27 @@
             <div class="chat-header-text">DeepSeek</div>
         </div>
         
-        <div class="chat-box" id="chat-box"></div>
+        <div class="chat-box" id="chat-box">
+            <!-- Welcome Message -->
+            <div class="welcome-container" id="welcome-container">
+                <div class="welcome-text">How can I help you today?</div>
+                <div class="welcome-subtext">Get started with these example questions</div>
+                <div class="examples-container">
+                    <div class="example-question" onclick="handleExampleClick('Explain quantum computing in simple terms')">
+                        Explain quantum computing in simple terms
+                    </div>
+                    <div class="example-question" onclick="handleExampleClick('How do I make a HTTP request in JavaScript?')">
+                        How do I make a HTTP request in JavaScript?
+                    </div>
+                    <div class="example-question" onclick="handleExampleClick('Write a poem about artificial intelligence')">
+                        Write a poem about artificial intelligence
+                    </div>
+                    <div class="example-question" onclick="handleExampleClick('Give me 3 ideas for a science fiction story')">
+                        Give me 3 ideas for a science fiction story
+                    </div>
+                </div>
+            </div>
+        </div>
         
         <div class="input-container">
             <input id="user-input" type="text" placeholder="Ask me something..." 
@@ -257,6 +309,7 @@
             messageDiv.className = `message ${className}`;
             messageDiv.innerHTML = text.replace(/\n/g, '<br>');
             chatBox.appendChild(messageDiv);
+            checkWelcomeVisibility();
         }
 
         function createTypingIndicator() {
@@ -274,6 +327,22 @@
             if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
                 sendMessage();
+            }
+        }
+
+        function handleExampleClick(question) {
+            const inputField = document.getElementById("user-input");
+            inputField.value = question;
+            sendMessage();
+        }
+
+        function checkWelcomeVisibility() {
+            const chatBox = document.getElementById("chat-box");
+            const welcomeContainer = document.getElementById("welcome-container");
+            if (chatBox.children.length > 1) { // Welcome message + at least one message
+                welcomeContainer.style.display = 'none';
+            } else {
+                welcomeContainer.style.display = 'flex';
             }
         }
 
