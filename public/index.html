@@ -97,21 +97,27 @@
 
             if (!userInput.value.trim()) return;
 
-            // Add user message
+            // Add user message to chat box
             appendMessage("You", userInput.value, "user-message");
 
-            // Fetch bot response
+            // Fetch bot response from the backend
             const response = await fetch("/api/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message: userInput.value }),
             });
-            const data = await response.json();
-            
-            // Add bot response
-            appendMessage("Bot", data.reply, "bot-message");
 
-            // Clear input
+            // Parse the bot's response
+            const data = await response.json();
+
+            // Check if response contains a valid reply and display bot's message
+            if (data.reply) {
+                appendMessage("Bot", data.reply, "bot-message");
+            } else {
+                appendMessage("Bot", "Sorry, I didn't understand that.", "bot-message");
+            }
+
+            // Clear input field and scroll to the bottom
             userInput.value = "";
             chatBox.scrollTop = chatBox.scrollHeight;
         }
