@@ -2,7 +2,7 @@ import OpenAI from "openai";
 
 const openai = new OpenAI({
   baseURL: "https://api.novita.ai/v3/openai",
-  apiKey: process.env.DEEPSEEK_API_KEY, // Securely use environment variables
+  apiKey: process.env.DEEPSEEK_API_KEY, // Must be set in Vercel
 });
 
 export default async function handler(req, res) {
@@ -11,7 +11,6 @@ export default async function handler(req, res) {
   }
 
   const { message } = req.body;
-
   if (!message) {
     return res.status(400).json({ error: "Message is required" });
   }
@@ -19,7 +18,7 @@ export default async function handler(req, res) {
   try {
     const completion = await openai.chat.completions.create({
       messages: [
-        { role: "system", content: "You are a helpful AI assistant." },
+        { role: "system", content: "You are a helpful assistant." },
         { role: "user", content: message },
       ],
       model: "meta-llama/llama-3.1-8b-instruct",
