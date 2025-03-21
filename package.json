@@ -4,15 +4,10 @@
   "description": "A chatbot using Deepseek and Novita.ai APIs",
   "main": "api/chat.js",
   "scripts": {
-    "build": "npm install",
-    "start": "node api/chat.js",
-    "dev": "vercel dev",
+    "start": "vercel dev",
     "deploy": "vercel --prod"
   },
   "dependencies": {
     "openai": "^4.0.0"
-  },
-  "engines": {
-    "node": ">=16.0.0"
   }
 }
