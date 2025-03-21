@@ -1,21 +1,23 @@
 import OpenAI from "openai";
-import dotenv from "dotenv";
 
-dotenv.config();
+const openai = new OpenAI({
+  baseURL: "https://api.novita.ai/v3/openai",
+  apiKey: process.env.DEEPSEEK_API_KEY, // Securely use environment variables
+});
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Only POST requests allowed" });
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   const { message } = req.body;
-  const openai = new OpenAI({
-    baseURL: "https://api.novita.ai/v3/openai",
-    apiKey: process.env.API_KEY,
-  });
+
+  if (!message) {
+    return res.status(400).json({ error: "Message is required" });
+  }
 
   try {
-    const response = await openai.chat.completions.create({
+    const completion = await openai.chat.completions.create({
       messages: [
         { role: "system", content: "You are a helpful AI assistant." },
         { role: "user", content: message },
@@ -24,8 +26,8 @@ export default async function handler(req, res) {
       stream: false,
     });
 
-    res.json({ reply: response.choices[0].message.content });
+    res.status(200).json({ response: completion.choices[0].message.content });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Error fetching response", details: error.message });
   }
 }
