@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Deepseek Chatbot</title>
     <style>
         :root {
@@ -10,33 +10,22 @@
             --primary-hover: #5B21B6;
             --background: #ffffff;
             --text-primary: #18181b;
-            --text-secondary: #71717a;
             --border: #e4e4e7;
             --bot-bg: #f4f4f5;
-            --user-bg: #6D28D9;
-            --user-text: #ffffff;
-            --error-bg: #fee2e2;
-            --error-text: #dc2626;
         }
 
         [data-theme="dark"] {
             --background: #18181b;
-            --text-primary: #f4f4f5;
-            --text-secondary: #a1a1aa;
+            --text-primary: #ffffff;
             --border: #3f3f46;
             --bot-bg: #27272a;
-            --user-bg: #6D28D9;
-            --primary: #8B5CF6;
-            --primary-hover: #7C3AED;
-            --error-bg: #7f1d1d;
-            --error-text: #fecaca;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
@@ -47,535 +36,175 @@
         }
 
         .chat-container {
-            width: 100vw;
+            width: 100%;
             height: 100vh;
             max-width: 800px;
             margin: 0 auto;
-            background: var(--background);
             display: flex;
             flex-direction: column;
-            border: 1px solid var(--border);
-            position: relative;
         }
 
         .chat-header {
-            padding: 12px 16px;
+            padding: 1rem;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            gap: 12px;
+            align-items: center;
             border-bottom: 1px solid var(--border);
-            background: var(--background);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-controls {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .logo {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, #6D28D9, #8B5CF6);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 14px;
-            flex-shrink: 0;
         }
 
         .chat-box {
             flex: 1;
             overflow-y: auto;
-            padding: 16px;
+            padding: 1rem;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            position: relative;
+            gap: 1rem;
         }
 
         .message {
-            max-width: 85%;
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 14px;
-            line-height: 1.5;
-            animation: fadeIn 0.3s ease-out;
-            display: flex;
-            gap: 12px;
-            position: relative;
+            max-width: 80%;
+            padding: 1rem;
+            border-radius: 1rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .user-message {
+            background: var(--primary);
+            color: white;
+            margin-left: auto;
         }
 
         .bot-message {
             background: var(--bot-bg);
             color: var(--text-primary);
             margin-right: auto;
-            border-radius: 12px 12px 12px 0;
-        }
-
-        .user-message {
-            background: var(--user-bg);
-            color: var(--user-text);
-            margin-left: auto;
-            border-radius: 12px 12px 0 12px;
-        }
-
-        .message-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, 0.1);
-        }
-
-        .message-content {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .message-actions {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            display: none;
-            gap: 4px;
-        }
-
-        .message:hover .message-actions {
-            display: flex;
-        }
-
-        .message-action {
-            background: rgba(0, 0, 0, 0.4);
-            border: none;
-            color: white;
-            width: 24px;
-            height: 24px;
-            border-radius: 4px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .message-timestamp {
-            font-size: 10px;
-            color: var(--text-secondary);
-            margin-top: 4px;
-            text-align: right;
         }
 
         .input-container {
-            padding: 16px;
-            background: var(--background);
+            padding: 1rem;
             border-top: 1px solid var(--border);
-            position: sticky;
-            bottom: 0;
         }
 
         .input-wrapper {
-            position: relative;
             display: flex;
-            gap: 8px;
+            gap: 0.5rem;
         }
 
         textarea {
-            width: 100%;
-            padding: 12px 16px;
+            flex: 1;
+            padding: 0.8rem;
             border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 14px;
+            border-radius: 0.5rem;
+            resize: none;
             background: var(--background);
             color: var(--text-primary);
-            resize: none;
-            min-height: 44px;
-            max-height: 150px;
-            line-height: 1.5;
         }
 
         button {
-            padding: 0;
+            padding: 0.8rem 1.5rem;
             background: var(--primary);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 0.5rem;
             cursor: pointer;
-            font-weight: 500;
-            transition: background 0.2s ease;
-            flex-shrink: 0;
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        button:hover {
-            background: var(--primary-hover);
-        }
-
-        .send-icon {
-            width: 24px;
-            height: 24px;
-            fill: currentColor;
-        }
-
-        .typing-indicator {
-            display: inline-flex;
-            align-items: center;
-            padding: 12px 16px;
-            background: var(--bot-bg);
-            border-radius: 12px;
-            width: 80px;
-        }
-
-        .typing-dot {
-            width: 6px;
-            height: 6px;
-            background: var(--text-secondary);
-            border-radius: 50%;
-            animation: typing 1.4s infinite ease-in-out;
-            margin: 0 2px;
-        }
-
-        .welcome-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            text-align: center;
-            opacity: 1;
-            transition: opacity 0.3s ease;
-        }
-
-        .welcome-container.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .examples-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            max-width: 800px;
-            width: 100%;
-            margin-top: 24px;
-        }
-
-        .example-question {
-            padding: 12px;
-            background: var(--bot-bg);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 1px solid var(--border);
-            font-size: 14px;
-            text-align: left;
-        }
-
-        .example-question:hover {
-            background: var(--primary);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .scroll-bottom-btn {
-            position: fixed;
-            bottom: 80px;
-            right: 20px;
-            background: var(--primary);
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .error-message {
-            background: var(--error-bg);
-            color: var(--error-text);
-            padding: 12px;
-            border-radius: 8px;
-            margin: 8px 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            animation: fadeIn 0.3s ease;
         }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-4px); }
-        }
-
-        @media (max-width: 768px) {
-            .examples-container {
-                grid-template-columns: 1fr;
-            }
-            
-            .message {
-                max-width: 90%;
-            }
-            
-            .chat-header-text {
-                display: none;
-            }
-        }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 </head>
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <div class="logo">DS</div>
-            <div class="header-controls">
-                <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
-                <button onclick="clearHistory()">Clear History</button>
-            </div>
+            <h1>Deepseek Chat</h1>
+            <button onclick="toggleTheme()">Toggle Theme</button>
         </div>
         
-        <div class="chat-box" id="chat-box" onscroll="handleScroll()">
-            <div class="welcome-container" id="welcome-container">
-                <h2>How can I help you today?</h2>
-                <div class="examples-container">
-                    <div class="example-question" onclick="handleExampleClick('Explain quantum computing in simple terms')">
-                        Explain quantum computing in simple terms
-                    </div>
-                    <div class="example-question" onclick="handleExampleClick('How do I make a HTTP request in JavaScript?')">
-                        How do I make a HTTP request in JavaScript?
-                    </div>
-                    <div class="example-question" onclick="handleExampleClick('Write a poem about artificial intelligence')">
-                        Write a poem about artificial intelligence
-                    </div>
-                    <div class="example-question" onclick="handleExampleClick('Give me 3 ideas for a science fiction story')">
-                        Give me 3 ideas for a science fiction story
-                    </div>
-                </div>
-            </div>
+        <div class="chat-box" id="chatBox">
+            <div class="message bot-message">Hello! How can I help you today?</div>
         </div>
         
         <div class="input-container">
             <div class="input-wrapper">
-                <textarea id="user-input" placeholder="Ask me something..." 
-                       onkeydown="handleInput(event)" rows="1"></textarea>
-                <button onclick="sendMessage()" aria-label="Send message">
-                    <svg class="send-icon" viewBox="0 0 24 24">
-                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                    </svg>
-                </button>
+                <textarea id="userInput" placeholder="Type your message..."></textarea>
+                <button id="sendButton">Send</button>
             </div>
         </div>
-        <div class="scroll-bottom-btn" id="scroll-bottom-btn" onclick="scrollToBottom()">↓</div>
     </div>
 
     <script>
         let isProcessing = false;
-        let messages = JSON.parse(localStorage.getItem('chatMessages')) || [];
-        let abortController = new AbortController();
-
-        marked.setOptions({
-            breaks: true,
-            highlight: (code, lang) => {
-                const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-                return hljs.highlight(code, { language }).value;
-            }
-        });
-
-        window.addEventListener('DOMContentLoaded', () => {
-            loadTheme();
-            renderMessages();
-            adjustTextareaHeight();
-        });
-
-        async function sendMessage() {
-            if (isProcessing) return;
-            
-            const userInput = document.getElementById("user-input");
-            const message = userInput.value.trim();
-
-            if (!message) {
-                userInput.focus();
-                return;
-            }
-
-            isProcessing = true;
-            userInput.disabled = true;
-            
-            try {
-                addMessage(message, 'user');
-                userInput.value = "";
-                adjustTextareaHeight();
-                showTypingIndicator();
-                
-                abortController = new AbortController();
-                const response = await fetch("/api/chat", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message }),
-                    signal: abortController.signal
-                });
-
-                if (!response.ok) throw new Error(await response.text());
-                
-                const data = await response.json();
-                addMessage(data.reply, 'bot');
-            } catch (error) {
-                if (error.name !== 'AbortError') {
-                    showErrorMessage(error.message || "Connection error. Please try again.");
-                }
-            } finally {
-                isProcessing = false;
-                userInput.disabled = false;
-                userInput.focus();
-                removeTypingIndicator();
-                scrollToBottom();
-            }
-        }
-
-        function renderMessages() {
-            const chatBox = document.getElementById("chat-box");
-            const welcomeContainer = document.getElementById("welcome-container");
-            
-            welcomeContainer.classList.toggle('hidden', messages.length > 0);
-            
-            chatBox.innerHTML = messages.map(msg => `
-                <div class="message ${msg.role === 'user' ? 'user-message' : 'bot-message'}">
-                    <div class="message-avatar">
-                        ${msg.role === 'user' ? '👤' : '🤖'}
-                    </div>
-                    <div class="message-content">
-                        ${msg.role === 'user' ? msg.content : marked.parse(msg.content)}
-                        <div class="message-timestamp">
-                            ${formatTime(msg.timestamp)}
-                        </div>
-                    </div>
-                    <div class="message-actions">
-                        <button class="message-action" onclick="copyToClipboard('${msg.id}')">⎘</button>
-                        ${msg.role === 'user' ? `
-                            <button class="message-action" onclick="editMessage('${msg.id}')">✎</button>
-                        ` : ''}
-                        <button class="message-action" onclick="deleteMessage('${msg.id}')">✕</button>
-                    </div>
-                </div>
-            `).join('');
-            
-            document.querySelectorAll('pre code').forEach(hljs.highlightElement);
-            scrollToBottom();
-        }
-
-        function showTypingIndicator() {
-            const chatBox = document.getElementById("chat-box");
-            chatBox.innerHTML += `
-                <div class="message bot-message typing-indicator">
-                    <div class="message-avatar">🤖</div>
-                    <div class="message-content">
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
-                    </div>
-                </div>
-            `;
-            scrollToBottom();
-        }
-
-        function removeTypingIndicator() {
-            const chatBox = document.getElementById("chat-box");
-            const typingIndicators = chatBox.getElementsByClassName('typing-indicator');
-            while(typingIndicators.length > 0) {
-                typingIndicators[0].remove();
-            }
-        }
-
-        function adjustTextareaHeight() {
-            const textarea = document.getElementById("user-input");
-            textarea.style.height = 'auto';
-            textarea.style.height = `${Math.min(textarea.scrollHeight, 150)}px`;
-        }
-
-        function handleInput(event) {
-            adjustTextareaHeight();
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                sendMessage();
-            }
-        }
-
+        
+        // Theme management
         function toggleTheme() {
-            const theme = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-            document.body.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
+            const currentTheme = document.body.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
         }
 
+        // Load saved theme
         function loadTheme() {
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.body.setAttribute('data-theme', savedTheme);
         }
 
-        function clearHistory() {
-            messages = [];
-            saveMessages();
-            renderMessages();
-        }
+        // Send message functionality
+        async function sendMessage() {
+            if (isProcessing) return;
+            
+            const userInput = document.getElementById('userInput');
+            const message = userInput.value.trim();
+            
+            if (!message) return;
 
-        function saveMessages() {
-            localStorage.setItem('chatMessages', JSON.stringify(messages));
-        }
+            isProcessing = true;
+            
+            try {
+                // Add user message
+                addMessage(message, 'user');
+                userInput.value = '';
+                
+                // Simulated API call
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
 
-        function copyToClipboard(messageId) {
-            const message = messages.find(m => m.id == messageId);
-            if (message) {
-                navigator.clipboard.writeText(message.content);
+                const data = await response.json();
+                addMessage(data.reply, 'bot');
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage('Sorry, something went wrong. Please try again.', 'bot');
+            } finally {
+                isProcessing = false;
             }
         }
 
-        function editMessage(messageId) {
-            const message = messages.find(m => m.id == messageId);
-            if (message) {
-                const newContent = prompt('Edit your message:', message.content);
-                if (newContent !== null) {
-                    message.content = newContent.trim();
-                    saveMessages();
-                    renderMessages();
-                }
+        // Add message to chat
+        function addMessage(content, role) {
+            const chatBox = document.getElementById('chatBox');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}-message`;
+            messageDiv.textContent = content;
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Event listeners
+        document.getElementById('sendButton').addEventListener('click', sendMessage);
+        document.getElementById('userInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
             }
-        }
+        });
 
-        function deleteMessage(messageId) {
-            messages = messages.filter(m => m.id != messageId);
-            saveMessages();
-            renderMessages();
-        }
-
-        function handleExampleClick(question) {
-            document.getElementById("user-input").value = question;
-            sendMessage();
-        }
-
-        function formatTime(isoString) {
-            const date = new Date(isoString);
-            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
+        // Initialize
+        loadTheme();
+    </script>
+</body>
+</html>
