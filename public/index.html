@@ -125,6 +125,11 @@
             cursor: pointer;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         @media (max-width: 768px) {
             .examples-container {
                 grid-template-columns: 1fr;
@@ -141,11 +146,17 @@
         
         <div class="chat-box" id="chatBox">
             <div class="examples-container">
-                <div class="example-card" onclick="handleExample('Explain quantum computing')">
+                <div class="example-card" data-question="Explain quantum computing">
                     What is quantum computing?
                 </div>
-                <div class="example-card" onclick="handleExample('Write a poem about AI')">
+                <div class="example-card" data-question="Write a poem about AI">
                     AI poetry
+                </div>
+                <div class="example-card" data-question="How to make HTTP request in JavaScript">
+                    JavaScript HTTP
+                </div>
+                <div class="example-card" data-question="Science fiction story ideas">
+                    Sci-fi ideas
                 </div>
             </div>
         </div>
@@ -153,14 +164,28 @@
         <div class="input-container">
             <div class="input-wrapper">
                 <textarea id="userInput" placeholder="Type your message..."></textarea>
-                <button onclick="sendMessage()">Send</button>
+                <button id="sendButton">Send</button>
             </div>
         </div>
     </div>
 
     <script>
-        let messages = [];
-        
+        let isProcessing = false;
+        const responses = {
+            "quantum": "Quantum computing uses quantum bits (qubits) to perform calculations...",
+            "poem": "Roses are red, Violets are blue, AI is smart, And so are you!",
+            "javascript": "Use fetch API: fetch('url').then(response => response.json())",
+            "sci-fi": "1. AI colony on Mars\n2. Time-traveling historians\n3. Underwater civilization"
+        };
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('sendButton').addEventListener('click', sendMessage);
+            document.querySelectorAll('.example-card').forEach(card => {
+                card.addEventListener('click', () => handleExample(card.dataset.question));
+            });
+        });
+
         function addMessage(content, isUser) {
             const chatBox = document.getElementById('chatBox');
             const messageDiv = document.createElement('div');
@@ -170,20 +195,45 @@
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        function sendMessage() {
+        async function sendMessage() {
+            if (isProcessing) return;
+            
             const input = document.getElementById('userInput');
             const message = input.value.trim();
             
             if (!message) return;
 
-            // Add user message
-            addMessage(message, true);
-            input.value = '';
+            isProcessing = true;
+            input.disabled = true;
+            
+            try {
+                addMessage(message, true);
+                input.value = '';
 
-            // Simulated API response - REPLACE WITH REAL API CALL
-            setTimeout(() => {
-                addMessage("This is a sample response from the AI", false);
-            }, 1000);
+                // Simulated API call with different responses
+                const response = await mockApiCall(message);
+                addMessage(response, false);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage(`Error: ${error.message}`, false);
+            } finally {
+                isProcessing = false;
+                input.disabled = false;
+            }
+        }
+
+        async function mockApiCall(message) {
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Return different responses based on keywords
+            const lowerMessage = message.toLowerCase();
+            if (lowerMessage.includes('quantum')) return responses.quantum;
+            if (lowerMessage.includes('poem')) return responses.poem;
+            if (lowerMessage.includes('javascript')) return responses.javascript;
+            if (lowerMessage.includes('sci-fi')) return responses.sci-fi;
+            return "I'm a mock AI. For real responses, implement API integration.";
         }
 
         function handleExample(question) {
