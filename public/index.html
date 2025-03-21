@@ -140,6 +140,7 @@
             .chat-container {
                 width: 95%;
                 height: 90vh;
+                bottom: 0; /* Ensure the input stays at the bottom */
             }
 
             .chat-header {
@@ -152,6 +153,40 @@
 
             input {
                 padding: 10px;
+            }
+
+            .input-container {
+                padding: 8px 12px;
+            }
+
+            button {
+                font-size: 16px;
+                padding: 10px;
+            }
+        }
+
+        /* Adjust for very small screens */
+        @media (max-width: 480px) {
+            .chat-container {
+                height: 85vh;
+            }
+
+            .chat-box {
+                padding: 10px;
+            }
+
+            .input-container {
+                padding: 8px;
+            }
+
+            input {
+                padding: 8px;
+                font-size: 14px;
+            }
+
+            button {
+                font-size: 14px;
+                padding: 8px;
             }
         }
     </style>
