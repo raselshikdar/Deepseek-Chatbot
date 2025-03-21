@@ -2,7 +2,7 @@ import OpenAI from "openai";
 
 const openai = new OpenAI({
   baseURL: "https://api.novita.ai/v3/openai",
-  apiKey: process.env.OPENAI_API_KEY, // Securely stored in Vercel
+  apiKey: process.env.DEEPSEEK_API_KEY, // Securely stored in Vercel
 });
 
 export default async function handler(req, res) {
