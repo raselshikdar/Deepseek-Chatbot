@@ -1,1 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deepseek Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        input, button { padding: 10px; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Deepseek Chatbot</h1>
+    <input id="user-input" type="text" placeholder="Ask me something...">
+    <button onclick="sendMessage()">Send</button>
+    <p id="response"></p>
 
+    <script>
+        async function sendMessage() {
+            const userMessage = document.getElementById("user-input").value;
+            const response = await fetch("/api/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: userMessage }),
+            });
+            const data = await response.json();
+            document.getElementById("response").innerText = "Bot: " + data.reply;
+        }
+    </script>
+</body>
+</html>
