@@ -12,8 +12,8 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #8e2de2, #4a00e0);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -24,14 +24,14 @@
 
         .chat-container {
             width: 100%;
-            height: 100%;
-            max-width: 600px;
-            max-height: 800px;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            height: 80vh;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
+            position: relative;
             overflow: hidden;
         }
 
@@ -40,8 +40,10 @@
             color: white;
             text-align: center;
             padding: 16px;
-            font-size: 24px;
-            font-weight: bold;
+            font-size: 22px;
+            font-weight: 600;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
         }
 
         .chat-box {
@@ -50,69 +52,106 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             height: 100%;
+            padding-right: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
         }
 
         .message {
-            padding: 12px 20px;
-            border-radius: 15px;
-            max-width: 70%;
+            padding: 12px 18px;
+            border-radius: 25px;
+            max-width: 75%;
             word-wrap: break-word;
+            margin-bottom: 12px;
+            font-size: 16px;
+            line-height: 1.5;
+            animation: fadeIn 0.5s ease-in-out;
         }
 
         .user-message {
             background: #0078ff;
             color: white;
             align-self: flex-end;
+            border-top-right-radius: 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .bot-message {
             background: #e5e5e5;
             color: black;
             align-self: flex-start;
+            border-top-left-radius: 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .input-container {
             display: flex;
-            padding: 15px;
+            padding: 10px;
             background: #fff;
             border-top: 1px solid #ddd;
-            position: relative;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            z-index: 1;
+            box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
         }
 
         input {
             flex: 1;
-            padding: 15px;
-            border: 1px solid #ccc;
+            padding: 12px;
+            border: 2px solid #ccc;
             border-radius: 30px;
             outline: none;
             font-size: 16px;
+            margin-right: 10px;
         }
 
         button {
-            padding: 15px;
+            padding: 12px;
             background: #0078ff;
             color: white;
             border: none;
             border-radius: 50%;
             cursor: pointer;
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
             font-size: 18px;
+            transition: background 0.3s ease;
         }
 
         button:hover {
             background: #005bbf;
         }
 
-        /* Styling for mobile responsiveness */
-        @media (max-width: 600px) {
+        /* Smooth fade-in animation */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsiveness */
+        @media (max-width: 768px) {
             .chat-container {
-                width: 100%;
-                height: 100%;
+                width: 95%;
+                height: 90vh;
+            }
+
+            .chat-header {
+                font-size: 18px;
+            }
+
+            .message {
+                max-width: 80%;
+            }
+
+            input {
+                padding: 10px;
             }
         }
     </style>
@@ -137,14 +176,13 @@
             // Add user message
             appendMessage("You", userInput.value, "user-message");
 
-            // Fetch bot response from the backend
+            // Fetch bot response
             const response = await fetch("/api/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message: userInput.value }),
             });
 
-            // Parse the response
             const data = await response.json();
 
             // Add bot response
