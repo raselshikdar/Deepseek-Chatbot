@@ -40,7 +40,6 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            transition: background 0.3s ease;
         }
 
         .chat-container {
@@ -157,43 +156,14 @@
             color: var(--text-secondary);
         }
 
-        .examples-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .example-card {
-            padding: 1.25rem;
-            border: 1px solid var(--border);
-            border-radius: 0.75rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            background: var(--background);
-        }
-
-        .example-card:hover {
-            transform: translateY(-2px);
-            border-color: var(--text-primary);
-        }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         @media (max-width: 768px) {
-            .examples-container {
-                grid-template-columns: 1fr;
-            }
-            
             .message {
                 max-width: 95%;
-            }
-            
-            .chat-header {
-                padding: 1rem;
             }
         }
     </style>
@@ -210,42 +180,16 @@
                 </svg>
                 <span>DeepSeek</span>
             </div>
-            <div class="controls">
-                <button onclick="toggleTheme()">🌓</button>
-                <button onclick="clearHistory()">Clear</button>
-            </div>
+            <button onclick="toggleTheme()">🌓</button>
         </div>
 
-        <div class="chat-box" id="chatBox">
-            <div class="welcome-message">
-                <div class="message">
-                    <div class="avatar bot-avatar">AI</div>
-                    <div class="message-content">
-                        <h3>How can I help you today?</h3>
-                        <div class="examples-container">
-                            <div class="example-card" onclick="handleExample('Explain quantum computing in simple terms')">
-                                Explain quantum computing
-                            </div>
-                            <div class="example-card" onclick="handleExample('How do I make a HTTP request in JavaScript?')">
-                                JavaScript HTTP request
-                            </div>
-                            <div class="example-card" onclick="handleExample('Write a poem about artificial intelligence')">
-                                AI poetry
-                            </div>
-                            <div class="example-card" onclick="handleExample('Give me 3 ideas for a science fiction story')">
-                                Sci-fi story ideas
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div class="chat-box" id="chatBox"></div>
 
         <div class="input-container">
             <div class="input-wrapper">
                 <textarea 
                     id="userInput" 
-                    placeholder="Ask DeepSeek..." 
+                    placeholder="Ask me anything..." 
                     rows="1"
                     oninput="autoResize()"
                     onkeydown="handleKeyDown(event)"
@@ -261,21 +205,15 @@
 
     <script>
         let isProcessing = false;
-        let messages = JSON.parse(localStorage.getItem('chatHistory') || []);
+        let messages = JSON.parse(localStorage.getItem('chatHistory') || '[]');
 
         marked.setOptions({
             breaks: true,
-            highlight: (code, lang) => hljs.highlightAuto(code).value
+            highlight: (code) => hljs.highlightAuto(code).value
         });
 
         function renderMessages() {
             const chatBox = document.getElementById('chatBox');
-            const welcomeContainer = document.querySelector('.welcome-message');
-            
-            // Toggle welcome message
-            welcomeContainer.style.display = messages.length > 0 ? 'none' : 'block';
-            
-            // Clear and re-render messages
             chatBox.innerHTML = messages.map(msg => `
                 <div class="message ${msg.role === 'user' ? 'user-message' : ''}">
                     <div class="avatar ${msg.role === 'user' ? '' : 'bot-avatar'}">
@@ -287,7 +225,6 @@
                 </div>
             `).join('');
             
-            // Apply syntax highlighting
             document.querySelectorAll('pre code').forEach(hljs.highlightElement);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
@@ -304,19 +241,15 @@
             input.disabled = true;
             
             try {
-                // Add user message
                 messages.push({ role: 'user', content: message });
                 localStorage.setItem('chatHistory', JSON.stringify(messages));
                 renderMessages();
                 input.value = '';
                 
-                // Call your API endpoint
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        messages: [{ role: 'user', content: message }]
-                    })
+                    body: JSON.stringify({ messages: [{ role: 'user', content: message }] })
                 });
 
                 if (!response.ok) throw new Error('Request failed');
@@ -328,23 +261,13 @@
                 
             } catch (error) {
                 console.error('Error:', error);
-                messages.push({
-                    role: 'assistant',
-                    content: '**Error:** Failed to get response. Please try again.'
-                });
+                messages.push({ role: 'assistant', content: `**Error:** ${error.message}` });
                 renderMessages();
             } finally {
                 isProcessing = false;
                 input.disabled = false;
                 input.focus();
             }
-        }
-
-        function handleExample(question) {
-            const input = document.getElementById('userInput');
-            input.value = question;
-            autoResize();
-            sendMessage();
         }
 
         function autoResize() {
@@ -358,13 +281,6 @@
                 e.preventDefault();
                 sendMessage();
             }
-        }
-
-        function clearHistory() {
-            messages = [];
-            localStorage.removeItem('chatHistory');
-            renderMessages();
-            document.getElementById('userInput').focus();
         }
 
         function toggleTheme() {
