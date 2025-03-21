@@ -5,26 +5,129 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Deepseek Chatbot</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-        input, button { padding: 10px; margin: 10px; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .chat-container {
+            width: 400px;
+            max-width: 90%;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .chat-header {
+            background: #0078ff;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 18px;
+        }
+        .chat-box {
+            height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+        .message {
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        .user-message {
+            background: #0078ff;
+            color: white;
+            align-self: flex-end;
+        }
+        .bot-message {
+            background: #e5e5e5;
+            color: black;
+            align-self: flex-start;
+        }
+        .input-container {
+            display: flex;
+            padding: 10px;
+            background: #fff;
+            border-top: 1px solid #ddd;
+        }
+        input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+        button {
+            padding: 10px;
+            background: #0078ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        button:hover {
+            background: #005bbf;
+        }
     </style>
 </head>
 <body>
-    <h1>Deepseek Chatbot</h1>
-    <input id="user-input" type="text" placeholder="Ask me something...">
-    <button onclick="sendMessage()">Send</button>
-    <p id="response"></p>
+    <div class="chat-container">
+        <div class="chat-header">Deepseek Chatbot</div>
+        <div class="chat-box" id="chat-box"></div>
+        <div class="input-container">
+            <input id="user-input" type="text" placeholder="Ask me something..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
 
     <script>
         async function sendMessage() {
-            const userMessage = document.getElementById("user-input").value;
+            const userInput = document.getElementById("user-input");
+            const chatBox = document.getElementById("chat-box");
+
+            if (!userInput.value.trim()) return;
+
+            // Add user message
+            appendMessage("You", userInput.value, "user-message");
+
+            // Fetch bot response
             const response = await fetch("/api/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: userMessage }),
+                body: JSON.stringify({ message: userInput.value }),
             });
             const data = await response.json();
-            document.getElementById("response").innerText = "Bot: " + data.reply;
+            
+            // Add bot response
+            appendMessage("Bot", data.reply, "bot-message");
+
+            // Clear input
+            userInput.value = "";
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function appendMessage(sender, text, className) {
+            const chatBox = document.getElementById("chat-box");
+            const messageDiv = document.createElement("div");
+            messageDiv.className = `message ${className}`;
+            messageDiv.innerText = `${sender}: ${text}`;
+            chatBox.appendChild(messageDiv);
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
         }
     </script>
 </body>
