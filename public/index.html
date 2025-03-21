@@ -6,26 +6,32 @@
     <title>DeepSeek Chat</title>
     <style>
         :root {
-            --primary: #6d28d9;
-            --primary-hover: #5b21b6;
-            --background: #ffffff;
-            --text-primary: #1e293b;
-            --border: #e2e8f0;
-            --bot-bg: #f8fafc;
+            --primary: #2A2A2A;
+            --primary-hover: #3A3A3A;
+            --background: #FFFFFF;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --border: #E5E7EB;
+            --bot-bg: #F9FAFB;
+            --user-bg: #2A2A2A;
+            --user-text: #FFFFFF;
         }
 
         [data-theme="dark"] {
-            --background: #0f172a;
-            --text-primary: #f8fafc;
-            --border: #334155;
-            --bot-bg: #1e293b;
+            --primary: #181818;
+            --background: #0A0A0A;
+            --text-primary: #E5E5E5;
+            --text-secondary: #A1A1A1;
+            --border: #333333;
+            --bot-bg: #1A1A1A;
+            --user-bg: #333333;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
 
         body {
@@ -34,7 +40,6 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            transition: background 0.3s ease;
         }
 
         .chat-container {
@@ -47,89 +52,108 @@
         }
 
         .chat-header {
-            padding: 1rem;
+            padding: 1rem 1.5rem;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
             border-bottom: 1px solid var(--border);
+            background: var(--background);
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
             font-weight: 600;
-        }
-
-        .theme-toggle {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
 
         .chat-box {
             flex: 1;
             overflow-y: auto;
-            padding: 1rem;
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.5rem;
         }
 
         .message {
-            max-width: 80%;
-            padding: 1rem;
-            border-radius: 1rem;
+            max-width: min(90%, 700px);
+            display: flex;
+            gap: 1rem;
             animation: fadeIn 0.3s ease;
         }
 
         .user-message {
-            background: var(--primary);
-            color: white;
             margin-left: auto;
+            flex-direction: row-reverse;
         }
 
-        .bot-message {
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--user-bg);
+            color: var(--user-text);
+            font-weight: 500;
+        }
+
+        .bot-avatar {
+            background: var(--primary);
+        }
+
+        .message-content {
+            padding: 1rem 1.25rem;
+            border-radius: 0.75rem;
             background: var(--bot-bg);
-            margin-right: auto;
+            line-height: 1.5;
             border: 1px solid var(--border);
+        }
+
+        .user-content {
+            background: var(--user-bg);
+            color: var(--user-text);
+            border: none;
         }
 
         .input-container {
-            padding: 1rem;
+            padding: 1.5rem;
             border-top: 1px solid var(--border);
+            background: var(--background);
         }
 
         .input-wrapper {
-            display: flex;
-            gap: 0.5rem;
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
         }
 
         textarea {
-            flex: 1;
-            padding: 1rem;
+            width: 100%;
+            padding: 1rem 4rem 1rem 1.5rem;
             border: 1px solid var(--border);
             border-radius: 0.75rem;
-            resize: none;
-            min-height: 56px;
             background: var(--background);
             color: var(--text-primary);
+            resize: none;
+            min-height: 56px;
+            max-height: 200px;
+            line-height: 1.5;
         }
 
-        button {
-            padding: 1rem;
-            background: var(--primary);
+        .send-button {
+            position: absolute;
+            right: 1rem;
+            bottom: 1rem;
+            padding: 0.5rem;
+            background: none;
             border: none;
-            border-radius: 0.75rem;
-            color: white;
             cursor: pointer;
-        }
-
-        .welcome-message {
-            text-align: center;
-            margin: auto;
-            padding: 2rem;
+            color: var(--text-secondary);
         }
 
         .examples-container {
@@ -140,16 +164,17 @@
         }
 
         .example-card {
-            padding: 1rem;
+            padding: 1.25rem;
             border: 1px solid var(--border);
             border-radius: 0.75rem;
             cursor: pointer;
             transition: all 0.2s ease;
+            background: var(--background);
         }
 
         .example-card:hover {
             transform: translateY(-2px);
-            border-color: var(--primary);
+            border-color: var(--text-primary);
         }
 
         @keyframes fadeIn {
@@ -163,35 +188,53 @@
             }
             
             .message {
-                max-width: 90%;
+                max-width: 95%;
+            }
+            
+            .chat-header {
+                padding: 1rem;
             }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 </head>
 <body>
     <div class="chat-container">
         <div class="chat-header">
             <div class="logo">
+                <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17v-2h2v2h-2zm2.07-7.75-.9.92c-.5.51-.86.97-1.04 1.69-.08.32-.13.68-.13 1.14h-2v-.5c0-.46.08-.9.22-1.31.2-.55.53-1.03.95-1.42l1.24-1.26c.38-.39.59-.89.59-1.42 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+                </svg>
                 <span>DeepSeek</span>
             </div>
-            <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+            <div class="controls">
+                <button onclick="toggleTheme()">🌓</button>
+                <button onclick="clearHistory()">Clear</button>
+            </div>
         </div>
 
         <div class="chat-box" id="chatBox">
             <div class="welcome-message">
-                <h2>How can I help you today?</h2>
-                <div class="examples-container">
-                    <div class="example-card" onclick="handleExample('Explain quantum computing')">
-                        Explain quantum computing
-                    </div>
-                    <div class="example-card" onclick="handleExample('JavaScript HTTP request')">
-                        JavaScript HTTP request
-                    </div>
-                    <div class="example-card" onclick="handleExample('Write a poem about AI')">
-                        Write a poem about AI
-                    </div>
-                    <div class="example-card" onclick="handleExample('Science fiction story ideas')">
-                        Science fiction story ideas
+                <div class="message">
+                    <div class="avatar bot-avatar">AI</div>
+                    <div class="message-content">
+                        <h3>How can I help you today?</h3>
+                        <div class="examples-container">
+                            <div class="example-card" onclick="handleExample('Explain quantum computing in simple terms')">
+                                Explain quantum computing in simple terms
+                            </div>
+                            <div class="example-card" onclick="handleExample('How do I make a HTTP request in JavaScript?')">
+                                How do I make a HTTP request in JavaScript?
+                            </div>
+                            <div class="example-card" onclick="handleExample('Write a poem about artificial intelligence')">
+                                Write a poem about artificial intelligence
+                            </div>
+                            <div class="example-card" onclick="handleExample('Give me 3 ideas for a science fiction story')">
+                                Give me 3 ideas for a science fiction story
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -201,43 +244,44 @@
             <div class="input-wrapper">
                 <textarea 
                     id="userInput" 
-                    placeholder="Type your message..." 
+                    placeholder="Ask DeepSeek..." 
                     rows="1"
                     oninput="autoResize()"
                     onkeydown="handleKeyDown(event)"
                 ></textarea>
-                <button onclick="sendMessage()">Send</button>
+                <button class="send-button" onclick="sendMessage()">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
 
     <script>
         let isProcessing = false;
-        let messages = [];
+        let messages = JSON.parse(localStorage.getItem('chatHistory') || [];
 
-        // Theme management
-        function toggleTheme() {
-            document.body.setAttribute('data-theme', 
-                document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
-            );
-            localStorage.setItem('theme', document.body.getAttribute('data-theme'));
-        }
+        marked.setOptions({
+            breaks: true,
+            highlight: (code, lang) => hljs.highlightAuto(code).value
+        });
 
-        // Load saved theme
-        function loadTheme() {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.body.setAttribute('data-theme', savedTheme);
-        }
-
-        // Message handling
-        function addMessage(content, isUser) {
+        function renderMessages() {
             const chatBox = document.getElementById('chatBox');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
-            messageDiv.textContent = content;
-            chatBox.appendChild(messageDiv);
+            chatBox.innerHTML = messages.map(msg => `
+                <div class="message ${msg.role === 'user' ? 'user-message' : ''}">
+                    <div class="avatar ${msg.role === 'user' ? '' : 'bot-avatar'}">
+                        ${msg.role === 'user' ? 'You' : 'AI'}
+                    </div>
+                    <div class="message-content ${msg.role === 'user' ? 'user-content' : ''}">
+                        ${msg.role === 'user' ? msg.content : marked.parse(msg.content)}
+                    </div>
+                </div>
+            `).join('');
+            
+            document.querySelectorAll('pre code').forEach(hljs.highlightElement);
             chatBox.scrollTop = chatBox.scrollHeight;
-            messages.push(content);
         }
 
         async function sendMessage() {
@@ -252,20 +296,27 @@
             input.disabled = true;
             
             try {
-                addMessage(message, true);
+                messages.push({ role: 'user', content: message });
+                localStorage.setItem('chatHistory', JSON.stringify(messages));
+                renderMessages();
                 input.value = '';
                 
-                // Simulated API call
-                const response = await new Promise(resolve => {
-                    setTimeout(() => resolve({
-                        content: "This is a sample response. Implement real API integration here."
-                    }), 1000);
+                // Simulated API call - Replace with actual API integration
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
                 });
 
-                addMessage(response.content, false);
+                const data = await response.json();
+                messages.push({ role: 'assistant', content: data.reply });
+                localStorage.setItem('chatHistory', JSON.stringify(messages));
+                renderMessages();
+                
             } catch (error) {
                 console.error('Error:', error);
-                addMessage("Error processing request", false);
+                messages.push({ role: 'assistant', content: 'Sorry, something went wrong. Please try again.' });
+                renderMessages();
             } finally {
                 isProcessing = false;
                 input.disabled = false;
@@ -273,15 +324,11 @@
             }
         }
 
-        // Example handling
         function handleExample(question) {
-            const input = document.getElementById('userInput');
-            input.value = question;
-            input.focus();
-            autoResize();
+            document.getElementById('userInput').value = question;
+            sendMessage();
         }
 
-        // Utilities
         function autoResize() {
             const textarea = document.getElementById('userInput');
             textarea.style.height = 'auto';
@@ -295,8 +342,21 @@
             }
         }
 
+        function clearHistory() {
+            messages = [];
+            localStorage.removeItem('chatHistory');
+            renderMessages();
+        }
+
+        function toggleTheme() {
+            const theme = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+
         // Initialize
-        loadTheme();
+        document.body.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+        renderMessages();
     </script>
 </body>
 </html>
