@@ -3,126 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeepSeek Clone</title>
+    <title>DeepSeek AI Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #2b2d42;
-            --background: #ffffff;
-            --text-primary: #1a1a1a;
-            --border: #e0e0e0;
-            --bot-bg: #f8f9fa;
-            --user-bg: #2b2d42;
-            --user-text: #ffffff;
-        }
-
-        [data-theme="dark"] {
-            --primary: #181818;
-            --background: #0a0a0a;
-            --text-primary: #ffffff;
-            --border: #333333;
-            --bot-bg: #1a1a1a;
+            --primary-color: #5145BA;
+            --secondary-color: #6D28D9;
+            --background-color: #ffffff;
+            --border-color: #e4e4e7;
+            --text-primary: #18181b;
+            --text-secondary: #64748b;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: "Montserrat", sans-serif;
         }
 
         body {
-            background: var(--background);
-            color: var(--text-primary);
             height: 100vh;
-            display: flex;
-            flex-direction: column;
+            background: var(--background-color);
         }
 
         .chat-container {
-            max-width: 800px;
-            margin: 0 auto;
-            width: 100%;
-            height: 100vh;
             display: flex;
             flex-direction: column;
+            height: 100vh;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--background-color);
         }
 
         .chat-header {
-            padding: 1rem;
+            padding: 1.5rem 2rem;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border);
+            gap: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--background-color);
         }
 
-        .chat-box {
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .chat-header-text {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chat-content {
             flex: 1;
             overflow-y: auto;
-            padding: 1rem;
+            padding: 2rem;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.5rem;
         }
 
         .message {
-            max-width: 80%;
-            padding: 1rem;
-            border-radius: 1rem;
-            animation: fadeIn 0.3s ease;
+            max-width: min(80%, 800px);
+            padding: 1.2rem 1.5rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            line-height: 1.6;
+            animation: fadeIn 0.3s ease-out;
+            position: relative;
         }
 
         .user-message {
-            background: var(--user-bg);
-            color: var(--user-text);
+            background: var(--primary-color);
+            color: white;
             margin-left: auto;
+            border-radius: 12px 12px 0 12px;
         }
 
         .bot-message {
-            background: var(--bot-bg);
+            background: #f8f9fa;
+            color: var(--text-primary);
             margin-right: auto;
-            border: 1px solid var(--border);
+            border-radius: 12px 12px 12px 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .input-container {
-            padding: 1rem;
-            border-top: 1px solid var(--border);
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border-color);
+            background: var(--background-color);
+            display: flex;
+            gap: 1rem;
+            position: relative;
         }
 
         .input-wrapper {
-            display: flex;
-            gap: 0.5rem;
+            flex: 1;
+            position: relative;
         }
 
-        textarea {
-            flex: 1;
-            padding: 1rem;
-            border: 1px solid var(--border);
-            border-radius: 0.75rem;
-            resize: none;
-            min-height: 50px;
+        input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: var(--background-color);
+            outline: none;
+            transition: all 0.2s ease;
+            padding-right: 4.5rem;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(81, 69, 186, 0.1);
         }
 
         button {
-            padding: 1rem;
-            background: var(--primary);
-            border: none;
-            border-radius: 0.75rem;
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 0.6rem 1.2rem;
+            background: var(--primary-color);
             color: white;
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .examples-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin-top: 2rem;
+        button:hover {
+            background: #403795;
         }
 
-        .example-card {
+        .loading-indicator {
+            display: none;
             padding: 1rem;
-            border: 1px solid var(--border);
-            border-radius: 0.75rem;
-            cursor: pointer;
+            justify-content: center;
+            align-items: center;
+            gap: 0.8rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .dot-flashing {
+            position: relative;
+            width: 8px;
+            height: 8px;
+            border-radius: 4px;
+            background-color: var(--text-secondary);
+            animation: dotFlashing 1s infinite linear alternate;
+        }
+
+        .dot-flashing::before, .dot-flashing::after {
+            content: '';
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            width: 8px;
+            height: 8px;
+            border-radius: 4px;
+            background-color: var(--text-secondary);
+        }
+
+        .dot-flashing::before {
+            left: -12px;
+            animation: dotFlashing 1s infinite alternate;
+            animation-delay: 0s;
+        }
+
+        .dot-flashing::after {
+            left: 12px;
+            animation: dotFlashing 1s infinite alternate;
+            animation-delay: 0.5s;
         }
 
         @keyframes fadeIn {
@@ -130,9 +198,42 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        @keyframes dotFlashing {
+            0% { background-color: var(--text-secondary); }
+            50%, 100% { background-color: rgba(100, 116, 139, 0.2); }
+        }
+
         @media (max-width: 768px) {
-            .examples-container {
-                grid-template-columns: 1fr;
+            .chat-container {
+                border: none;
+            }
+
+            .chat-header {
+                padding: 1rem;
+            }
+
+            .chat-content {
+                padding: 1rem;
+            }
+
+            .message {
+                max-width: 90%;
+                font-size: 0.95rem;
+                padding: 1rem;
+            }
+
+            .input-container {
+                padding: 1rem;
+            }
+
+            input {
+                padding: 0.8rem 1rem;
+                font-size: 0.95rem;
+            }
+
+            button {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -140,113 +241,112 @@
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <h1>DeepSeek</h1>
-            <button onclick="toggleTheme()">Toggle Theme</button>
+            <div class="logo">DS</div>
+            <div class="chat-header-text">DeepSeek AI Assistant</div>
         </div>
         
-        <div class="chat-box" id="chatBox">
-            <div class="examples-container">
-                <div class="example-card" data-question="Explain quantum computing">
-                    What is quantum computing?
-                </div>
-                <div class="example-card" data-question="Write a poem about AI">
-                    AI poetry
-                </div>
-                <div class="example-card" data-question="How to make HTTP request in JavaScript">
-                    JavaScript HTTP
-                </div>
-                <div class="example-card" data-question="Science fiction story ideas">
-                    Sci-fi ideas
-                </div>
+        <div class="chat-content" id="chat-box">
+            <!-- Initial greeting message -->
+            <div class="message bot-message">
+                Hello! I'm DeepSeek AI Assistant. How can I help you today?
             </div>
+        </div>
+
+        <div class="loading-indicator" id="loading">
+            <div class="dot-flashing"></div>
+            <span>Thinking...</span>
         </div>
 
         <div class="input-container">
             <div class="input-wrapper">
-                <textarea id="userInput" placeholder="Type your message..."></textarea>
-                <button id="sendButton">Send</button>
+                <input type="text" id="user-input" 
+                       placeholder="Type your message here..." 
+                       onkeydown="handleKeyPress(event)">
+                <button onclick="sendMessage()">
+                    Send
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
 
-    <script>
-        let isProcessing = false;
-        const responses = {
-            "quantum": "Quantum computing uses quantum bits (qubits) to perform calculations...",
-            "poem": "Roses are red, Violets are blue, AI is smart, And so are you!",
-            "javascript": "Use fetch API: fetch('url').then(response => response.json())",
-            "sci-fi": "1. AI colony on Mars\n2. Time-traveling historians\n3. Underwater civilization"
-        };
+        <script>
+        let messages = [];
 
-        // Event Listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('sendButton').addEventListener('click', sendMessage);
-            document.querySelectorAll('.example-card').forEach(card => {
-                card.addEventListener('click', () => handleExample(card.dataset.question));
-            });
-        });
-
-        function addMessage(content, isUser) {
-            const chatBox = document.getElementById('chatBox');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
-            messageDiv.textContent = content;
-            chatBox.appendChild(messageDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
+        // Function to send user message and get AI response
         async function sendMessage() {
-            if (isProcessing) return;
-            
-            const input = document.getElementById('userInput');
-            const message = input.value.trim();
-            
+            const inputField = document.getElementById('user-input');
+            const chatBox = document.getElementById('chat-box');
+            const message = inputField.value.trim();
+
             if (!message) return;
 
-            isProcessing = true;
-            input.disabled = true;
-            
-            try {
-                addMessage(message, true);
-                input.value = '';
+            // Add user message to chat
+            appendMessage(message, 'user-message');
+            messages.push({ role: 'user', content: message });
+            inputField.value = '';
 
-                // Simulated API call with different responses
-                const response = await mockApiCall(message);
-                addMessage(response, false);
-                
+            try {
+                showLoading(true);
+
+                // Send request to backend API
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ messages }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // Get and display AI response
+                const data = await response.json();
+                appendMessage(data.reply, 'bot-message');
+                messages.push({ role: 'assistant', content: data.reply });
+
             } catch (error) {
                 console.error('Error:', error);
-                addMessage(`Error: ${error.message}`, false);
+                appendMessage(
+                    "Sorry, I'm having trouble connecting. Please try again later.",
+                    'bot-message'
+                );
             } finally {
-                isProcessing = false;
-                input.disabled = false;
+                showLoading(false);
+                chatBox.scrollTop = chatBox.scrollHeight;
             }
         }
 
-        async function mockApiCall(message) {
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // Return different responses based on keywords
-            const lowerMessage = message.toLowerCase();
-            if (lowerMessage.includes('quantum')) return responses.quantum;
-            if (lowerMessage.includes('poem')) return responses.poem;
-            if (lowerMessage.includes('javascript')) return responses.javascript;
-            if (lowerMessage.includes('sci-fi')) return responses.sci-fi;
-            return "I'm a mock AI. For real responses, implement API integration.";
+        // Function to append new messages to the chat
+        function appendMessage(content, className) {
+            const chatBox = document.getElementById('chat-box');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${className}`;
+            messageDiv.innerHTML = content.replace(/\n/g, '<br>');
+            chatBox.appendChild(messageDiv);
         }
 
-        function handleExample(question) {
-            const input = document.getElementById('userInput');
-            input.value = question;
-            sendMessage();
+        // Function to show/hide loading indicator
+        function showLoading(show) {
+            const loading = document.getElementById('loading');
+            loading.style.display = show ? 'flex' : 'none';
         }
 
-        function toggleTheme() {
-            document.body.setAttribute('data-theme',
-                document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
-            );
+        // Handle Enter key press
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
         }
+
+        // Initial scroll to bottom
+        window.addEventListener('DOMContentLoaded', () => {
+            const chatBox = document.getElementById('chat-box');
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
     </script>
 </body>
 </html>
